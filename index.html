@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wishing Well</title>
+    <script src="https://connect.facebook.net/en_US/fbinstant.7.1.js"></script>
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body>
+    <p id="loading-indicator" class="loading" aria-live="polite">
+      <span class="loading__label">Loading</span
+      ><span class="loading__dots" aria-hidden="true"
+        ><span class="loading__dot">.</span><span class="loading__dot">.</span
+        ><span class="loading__dot">.</span></span
+      >
+    </p>
+    <p id="startup-banner" class="startup-banner" hidden></p>
+    <main class="app app--hidden">
+      <header class="app-header">
+        <img id="logo" class="app-logo" src="" alt="Wishing Well logo" width="80" height="80" />
+        <h1 id="greeting" class="app-greeting"></h1>
+      </header>
+
+      <section class="card" aria-labelledby="received-heading">
+        <h2 id="received-heading">I whish you:</h2>
+        <p id="wish-display" class="wish-display wish-display--empty"></p>
+      </section>
+
+      <section class="card" aria-labelledby="send-heading">
+        <h2 id="send-heading">Send a whish</h2>
+        <form id="send-form" class="send-form">
+          <label class="sr-only" for="wish-input">Your whish</label>
+          <textarea
+            id="wish-input"
+            class="wish-input"
+            rows="3"
+            maxlength="280"
+            placeholder="Type your whish here…"
+          ></textarea>
+          <button id="send-button" type="submit" class="send-button" disabled>
+            Send
+          </button>
+        </form>
+        <p id="status-message" class="status-message" hidden></p>
+      </section>
+    </main>
+  </body>
+</html>
