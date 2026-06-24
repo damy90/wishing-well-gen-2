@@ -27,6 +27,9 @@ export const SHARE_IMAGE_HEIGHT = 210;
 export const SHARE_TITLE = "Wishing Well";
 export const SHARE_SUBTITLE = "I whish you something special!";
 
+/** Canonical server assets host (GitHub Pages). */
+export const SERVER_BASE_URL = "https://damy90.github.io/wishing-well-gen-2";
+
 export const CSS_VARS = {
   colorText: "--color-text",
   colorAccent: "--color-accent",
@@ -40,8 +43,9 @@ export function shareText(wish: string): string {
   return `I whish you: ${wish}`;
 }
 
-/** GitHub Pages origin for server assets; empty string uses same-origin ./server/ */
+/** GitHub Pages origin for server assets. */
 export function getServerBaseUrl(): string {
-  const base = import.meta.env.VITE_SERVER_BASE_URL?.trim() ?? "";
+  const base =
+    import.meta.env.VITE_SERVER_BASE_URL?.trim() || SERVER_BASE_URL;
   return base.replace(/\/$/, "");
 }

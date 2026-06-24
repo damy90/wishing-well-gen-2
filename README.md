@@ -1,6 +1,6 @@
 # Wishing Well Gen 2
 
-A minimal Facebook Instant Game and self-hosted web app. Send a personal whish to a friend; when they open your share, they see it in **I whish you:**. Logo and greeting text are loaded from the GitHub Pages deployment (the self-hosted “server” side).
+A minimal Facebook Instant Game and self-hosted web app. Send a personal whish to a friend; when they open your share, they see it in **I whish you:**. Logo and greeting text are loaded from [https://damy90.github.io/wishing-well-gen-2/](https://damy90.github.io/wishing-well-gen-2/) (`server/greeting.json` and `server/logo.jpg`).
 
 ## Local development
 
@@ -24,19 +24,24 @@ Copy `.env.example` to `.env` and set your values:
 | Variable | Purpose |
 |----------|---------|
 | `GITHUB_PAGES_BASE` | Base path for GitHub Pages build (default `/wishing-well-gen-2/`) |
-| `VITE_SERVER_BASE_URL` | Full GitHub Pages origin for the Facebook build (e.g. `https://you.github.io/wishing-well-gen-2`) |
+| `VITE_SERVER_BASE_URL` | Server assets origin (default `https://damy90.github.io/wishing-well-gen-2`) |
 
-## Deploy GitHub Pages first (self-hosted side)
+## Deploy GitHub Pages (self-hosted side)
 
-The Facebook build fetches `server/greeting.json` and `server/logo.jpg` from this deployment at runtime.
+Server assets are hosted at:
+
+- `https://damy90.github.io/wishing-well-gen-2/server/greeting.json`
+- `https://damy90.github.io/wishing-well-gen-2/server/logo.jpg`
+
+The app fetches these at runtime. `build:github-pages` syncs them from the live site into `dist/server/` before deploy.
 
 1. Push this repo to GitHub.
 2. In **Settings → Pages**, set source to the **`gh-pages`** branch, folder **`/` (root)**.
 3. Push to `main` (or run the **Deploy GitHub Pages** workflow manually). The workflow builds and publishes `dist/` to `gh-pages`.
 4. Verify these URLs load:
-   - `https://YOUR_USER.github.io/wishing-well-gen-2/`
-   - `https://YOUR_USER.github.io/wishing-well-gen-2/server/greeting.json`
-   - `https://YOUR_USER.github.io/wishing-well-gen-2/server/logo.jpg`
+   - `https://damy90.github.io/wishing-well-gen-2/`
+   - `https://damy90.github.io/wishing-well-gen-2/server/greeting.json`
+   - `https://damy90.github.io/wishing-well-gen-2/server/logo.jpg`
 
 To build locally:
 
@@ -44,13 +49,11 @@ To build locally:
 npm run build:github-pages
 ```
 
-Output: `dist/` with `index.html`, `server/greeting.json`, and `server/logo.jpg` (copied from [`assets/logo.jpg`](assets/logo.jpg)).
-
-Replace [`assets/logo.jpg`](assets/logo.jpg) to change the logo.
+Output: `dist/` with `index.html` and `server/` assets synced from the live site.
 
 ## Build for Facebook Instant Games
 
-**Deploy GitHub Pages first** and set `VITE_SERVER_BASE_URL` in `.env` to your live Pages URL.
+Set `VITE_SERVER_BASE_URL` in `.env` if you need a different server origin (default: `https://damy90.github.io/wishing-well-gen-2`).
 
 ```bash
 npm install
@@ -100,8 +103,8 @@ https://www.facebook.com/embed/instantgames/YOUR_GAME_ID/player?game_url=https:/
 
 | Feature | Facebook Instant Game | Self-hosted / GitHub Pages |
 |---------|----------------------|----------------------------|
-| Greeting | `FBInstant.player.getName()` + template from `server/greeting.json` | `?user=` or **Guest** + same template |
-| Logo | Fetched from GitHub Pages `server/logo.jpg` | Same origin `server/logo.jpg` |
+| Greeting | `FBInstant.player.getName()` + template from live `server/greeting.json` | `?user=` or **Guest** + same template |
+| Logo | Fetched from live `server/logo.jpg` | Same |
 | Receive whish | `FBInstant.getEntryPointData().wish` | `?wish=` query param |
 | Send whish | `FBInstant.shareAsync({ data: { wish } })` | Web Share API or clipboard link |
 
@@ -112,14 +115,14 @@ On successful send, the text box is cleared.
 - Zip must contain `index.html` at the **root**, not inside a subfolder.
 - `fbapp-config.json` must be in the zip root next to `index.html`.
 - Recipients must open the **shared link** to receive the whish via `getEntryPointData()`.
-- Facebook build needs a live GitHub Pages URL in `VITE_SERVER_BASE_URL` before building `dist.zip`.
+- Facebook build fetches server assets from `https://damy90.github.io/wishing-well-gen-2` by default.
 - GitHub Pages project sites need `GITHUB_PAGES_BASE` to match the repo name (e.g. `/wishing-well-gen-2/`).
 
 ## Project layout
 
 ```
-assets/logo.jpg      # Source logo (copied to public/server/ on build)
-public/server/       # greeting.json + logo.jpg (deployed to GitHub Pages)
+scripts/sync-server-assets.mjs  # Pulls server/ assets from live GitHub Pages for deploy
+public/server/                  # Generated; not committed
 src/               # TypeScript app
 scripts/           # build-facebook.mjs (dist.zip), build-github-pages.mjs
 fbapp-config.json  # Instant Games platform config

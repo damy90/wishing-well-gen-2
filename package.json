@@ -4,10 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node scripts/copy-logo.mjs && vite",
-    "build": "node scripts/copy-logo.mjs && vite build",
-    "build:facebook": "node scripts/copy-logo.mjs && vite build && node scripts/build-facebook.mjs",
-    "build:github-pages": "node scripts/copy-logo.mjs && vite build --config vite.github-pages.config.ts && node scripts/build-github-pages.mjs"
+    "dev": "vite",
+    "build": "vite build",
+    "build:facebook": "vite build && node scripts/build-facebook.mjs",
+    "build:github-pages": "node scripts/sync-server-assets.mjs && vite build --config vite.github-pages.config.ts && node scripts/build-github-pages.mjs"
   },
   "devDependencies": {
     "bestzip": "^2.2.2",

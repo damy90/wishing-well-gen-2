@@ -6,4 +6,7 @@ export default defineConfig({
   base: "./",
   build: sharedBuildOptions,
   plugins: [omitFbInstantInDevPlugin],
+  env: {
+    VITE_SERVER_BASE_URL: "https://damy90.github.io/wishing-well-gen-2",
+  },
 });

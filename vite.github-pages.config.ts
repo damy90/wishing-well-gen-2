@@ -8,8 +8,4 @@ export default defineConfig({
   base: githubPagesBase.endsWith("/") ? githubPagesBase : `${githubPagesBase}/`,
   build: sharedBuildOptions,
   plugins: [omitFbInstantInDevPlugin],
-  env: {
-    // Same-origin ./server/ for logo and greeting on GitHub Pages.
-    VITE_SERVER_BASE_URL: "",
-  },
 });
