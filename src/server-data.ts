@@ -4,10 +4,7 @@ export interface GreetingConfig {
   template: string;
 }
 
-export interface ServerData {
-  greeting: GreetingConfig;
-  logoUrl: string;
-}
+const DEFAULT_GREETING_TEMPLATE = "Hello {name}";
 
 function serverAssetPath(filename: string): string {
   const base = getServerBaseUrl();
@@ -17,19 +14,48 @@ function serverAssetPath(filename: string): string {
   return `./server/${filename}`;
 }
 
-export async function fetchServerData(): Promise<ServerData> {
-  const greetingUrl = serverAssetPath("greeting.json");
-  const logoUrl = serverAssetPath("logo.jpg");
+/** Logo URL for the img src. Facebook build uses bundled ./server/logo.jpg. */
+export function getLogoUrl(): string {
+  const bundled = import.meta.env.VITE_LOGO_SRC?.trim();
+  if (bundled) {
+    return bundled;
+  }
+  return serverAssetPath("logo.jpg");
+}
 
-  const greetingRes = await fetch(greetingUrl);
-  if (!greetingRes.ok) {
-    throw new Error(`Failed to load greeting config (${greetingRes.status})`);
+async function fetchJson(url: string): Promise<GreetingConfig | null> {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      return null;
+    }
+    return (await response.json()) as GreetingConfig;
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchGreetingTemplate(): Promise<string> {
+  const remote = await fetchJson(serverAssetPath("greeting.json"));
+  if (remote?.template?.trim()) {
+    return remote.template.trim();
   }
 
-  const greeting = (await greetingRes.json()) as GreetingConfig;
-  if (!greeting.template?.trim()) {
-    throw new Error("Greeting config is missing template");
+  const bundled = await fetchJson("./server/greeting.json");
+  if (bundled?.template?.trim()) {
+    return bundled.template.trim();
   }
 
-  return { greeting, logoUrl };
+  return DEFAULT_GREETING_TEMPLATE;
+}
+
+export async function fetchServerData(): Promise<{
+  greeting: GreetingConfig;
+  logoUrl: string;
+}> {
+  const template = await fetchGreetingTemplate();
+  return {
+    greeting: { template },
+    logoUrl: getLogoUrl(),
+  };
 }

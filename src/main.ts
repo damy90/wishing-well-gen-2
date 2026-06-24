@@ -6,7 +6,7 @@ import {
   initFacebook,
   useUrlFallback,
 } from "./facebook";
-import { fetchServerData } from "./server-data";
+import { fetchGreetingTemplate, getLogoUrl } from "./server-data";
 import { wireSendForm } from "./send-form";
 import { getUserFromUrl, getWishFromUrl } from "./url-fallback";
 import {
@@ -76,16 +76,17 @@ function revealWithUi(entryData: WishEntryData | null, showBanner: boolean): voi
 async function main(): Promise<void> {
   hideApp();
 
-  const [serverData, startup] = await Promise.all([
-    fetchServerData(),
+  const elements = getElements();
+  displayLogo(elements.logo, getLogoUrl());
+
+  const [greetingTemplate, startup] = await Promise.all([
+    fetchGreetingTemplate(),
     loadStartup(),
   ]);
 
-  const elements = getElements();
-  displayLogo(elements.logo, serverData.logoUrl);
   displayGreeting(
     elements.greeting,
-    formatGreeting(serverData.greeting.template, startup.playerName),
+    formatGreeting(greetingTemplate, startup.playerName),
   );
 
   revealWithUi(startup.entryData, startup.showBanner);
@@ -95,6 +96,7 @@ main().catch(() => {
   useUrlFallback();
   try {
     const elements = getElements();
+    displayLogo(elements.logo, getLogoUrl());
     displayGreeting(elements.greeting, formatGreeting("Hello {name}", DEFAULT_PLAYER_NAME));
     revealWithUi({ wish: getWishFromUrl() }, true);
   } catch {
