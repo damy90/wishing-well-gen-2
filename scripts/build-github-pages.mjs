@@ -38,6 +38,7 @@ copyFileSync(successImageSrc, successImageDest);
 
 console.log("GitHub Pages build ready in dist/");
 console.log("  dist/index.html");
+console.log("  dist/debug.html");
 console.log("  dist/data/greeting.json");
 console.log("  dist/data/success.jpeg");
 console.log("  dist/assets/logo.jpg");

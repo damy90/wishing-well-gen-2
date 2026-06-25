@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "server": "node server/index.mjs",
+    "dev:full": "node server/index.mjs & vite",
     "build": "vite build",
     "build:facebook": "node scripts/sync-server-assets.mjs && vite build && node scripts/build-facebook.mjs",
     "build:github-pages": "node scripts/sync-server-assets.mjs && vite build --config vite.github-pages.config.ts && node scripts/build-github-pages.mjs"

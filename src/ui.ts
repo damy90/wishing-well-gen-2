@@ -1,8 +1,5 @@
 import { DATA_IMAGE_FAILED, DATA_IMAGE_WAITING, EMPTY_WISH_MESSAGE } from "./constants";
-import {
-  fetchRemoteImageObjectUrl,
-  getDataSuccessImageUrl,
-} from "./server-data";
+import { getDataSuccessImageUrl } from "./server-data";
 
 function getAppElement(): HTMLElement {
   return document.querySelector(".app")!;
@@ -46,6 +43,8 @@ export interface AppElements {
   wishDisplay: HTMLElement;
   dataReceiveStatus: HTMLElement;
   dataSuccessImage: HTMLImageElement;
+  dataSendBackButton: HTMLButtonElement;
+  dataSendBackStatus: HTMLElement;
   wishInput: HTMLTextAreaElement;
   sendButton: HTMLButtonElement;
   sendForm: HTMLFormElement;
@@ -59,6 +58,8 @@ export function getElements(): AppElements {
     wishDisplay: document.getElementById("wish-display")!,
     dataReceiveStatus: document.getElementById("data-receive-status")!,
     dataSuccessImage: document.getElementById("data-success-image") as HTMLImageElement,
+    dataSendBackButton: document.getElementById("data-send-back-button") as HTMLButtonElement,
+    dataSendBackStatus: document.getElementById("data-send-back-status")!,
     wishInput: document.getElementById("wish-input") as HTMLTextAreaElement,
     sendButton: document.getElementById("send-button") as HTMLButtonElement,
     sendForm: document.getElementById("send-form") as HTMLFormElement,
@@ -88,26 +89,37 @@ export function displayWish(wishDisplay: HTMLElement, wish: string | undefined):
 export async function loadDataSuccessImage(
   statusEl: HTMLElement,
   img: HTMLImageElement,
-): Promise<void> {
+): Promise<Blob | null> {
   statusEl.textContent = DATA_IMAGE_WAITING;
   statusEl.hidden = false;
   statusEl.classList.remove("data-receive-status--error");
   img.hidden = true;
   img.removeAttribute("src");
 
-  const objectUrl = await fetchRemoteImageObjectUrl(getDataSuccessImageUrl());
-  if (!objectUrl) {
+  const imageUrl = getDataSuccessImageUrl();
+  let blob: Blob | null = null;
+  try {
+    const response = await fetch(imageUrl);
+    if (!response.ok) {
+      statusEl.textContent = DATA_IMAGE_FAILED;
+      statusEl.classList.add("data-receive-status--error");
+      return null;
+    }
+    blob = await response.blob();
+  } catch {
     statusEl.textContent = DATA_IMAGE_FAILED;
     statusEl.classList.add("data-receive-status--error");
-    return;
+    return null;
   }
 
+  const objectUrl = URL.createObjectURL(blob);
   img.onload = () => {
     URL.revokeObjectURL(objectUrl);
   };
   img.src = objectUrl;
   img.hidden = false;
   statusEl.hidden = true;
+  return blob;
 }
 
 export function updateSendButton(

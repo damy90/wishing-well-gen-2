@@ -6,6 +6,14 @@ const githubPagesBase =
 
 export default defineConfig({
   base: githubPagesBase.endsWith("/") ? githubPagesBase : `${githubPagesBase}/`,
-  build: sharedBuildOptions,
+  build: {
+    ...sharedBuildOptions,
+    rollupOptions: {
+      input: {
+        main: "index.html",
+        debug: "debug.html",
+      },
+    },
+  },
   plugins: [omitFbInstantInDevPlugin],
 });

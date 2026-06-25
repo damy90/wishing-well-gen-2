@@ -1,5 +1,6 @@
 import "./styles.css";
 import { DEFAULT_PLAYER_NAME, FB_INIT_TIMEOUT_MS, STARTUP_FB_UNAVAILABLE } from "./constants";
+import { wireDataSendBack } from "./data-send-back";
 import { formatGreeting } from "./greeting";
 import {
   getPlayerName,
@@ -78,12 +79,22 @@ function revealWithUi(entryData: WishEntryData | null, showBanner: boolean): voi
   wireSendForm(elements);
 }
 
+async function loadDataImageAndWireSendBack(elements: ReturnType<typeof getElements>): Promise<void> {
+  const blob = await loadDataSuccessImage(
+    elements.dataReceiveStatus,
+    elements.dataSuccessImage,
+  );
+  if (blob) {
+    wireDataSendBack(elements, blob);
+  }
+}
+
 async function main(): Promise<void> {
   hideApp();
 
   const elements = getElements();
   displayLogo(elements.logo, getLogoUrl());
-  void loadDataSuccessImage(elements.dataReceiveStatus, elements.dataSuccessImage);
+  void loadDataImageAndWireSendBack(elements);
 
   const [greetingTemplate, startup] = await Promise.all([
     fetchGreetingTemplate(),
@@ -103,7 +114,7 @@ main().catch(() => {
   try {
     const elements = getElements();
     displayLogo(elements.logo, getLogoUrl());
-    void loadDataSuccessImage(elements.dataReceiveStatus, elements.dataSuccessImage);
+    void loadDataImageAndWireSendBack(elements);
     displayGreeting(
       elements.greeting,
       formatGreeting(DEFAULT_GREETING_TEMPLATE, DEFAULT_PLAYER_NAME),

@@ -16,6 +16,10 @@ export const STARTUP_FB_UNAVAILABLE =
 export const DATA_IMAGE_WAITING = "Waiting…";
 export const DATA_IMAGE_FAILED = "Failed to load data.";
 
+export const DATA_SEND_BACK_SENDING = "Sending…";
+export const DATA_SEND_BACK_SENT = "Data sent!";
+export const DATA_SEND_BACK_FAILED = "Failed to send data.";
+
 export const DEFAULT_PLAYER_NAME = "anonymous";
 
 /** Milliseconds before showing the UI when FBInstant init hangs outside Facebook. */
@@ -51,4 +55,10 @@ export function getServerBaseUrl(): string {
   const base =
     import.meta.env.VITE_SERVER_BASE_URL?.trim() || SERVER_BASE_URL;
   return base.replace(/\/$/, "");
+}
+
+/** Receive API origin (separate Node deploy). */
+export function getApiBaseUrl(): string {
+  const base = import.meta.env.VITE_API_BASE_URL?.trim();
+  return base ? base.replace(/\/$/, "") : "";
 }

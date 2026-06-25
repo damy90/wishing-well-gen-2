@@ -1,4 +1,4 @@
-import { getServerBaseUrl } from "./constants";
+import { getApiBaseUrl, getServerBaseUrl } from "./constants";
 
 export interface GreetingConfig {
   template: string;
@@ -66,6 +66,22 @@ export async function fetchRemoteImageObjectUrl(url: string): Promise<string | n
     return URL.createObjectURL(blob);
   } catch {
     return null;
+  }
+}
+
+export async function postDataToApi(body: Blob): Promise<void> {
+  const apiBase = getApiBaseUrl();
+  if (!apiBase) {
+    throw new Error("API base URL is not configured");
+  }
+
+  const response = await fetch(`${apiBase}/api/receive`, {
+    method: "POST",
+    body,
+    headers: { "Content-Type": body.type || "application/octet-stream" },
+  });
+  if (!response.ok) {
+    throw new Error(`POST failed: ${response.status}`);
   }
 }
 

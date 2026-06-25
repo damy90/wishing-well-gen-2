@@ -236,3 +236,48 @@ body {
   white-space: nowrap;
   border: 0;
 }
+
+.debug-app {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2rem;
+}
+
+.debug-status {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  color: rgba(240, 244, 248, 0.55);
+  font-style: italic;
+}
+
+.debug-meta {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: rgba(240, 244, 248, 0.7);
+}
+
+.debug-display {
+  min-height: 2rem;
+}
+
+.debug-image {
+  display: block;
+  max-width: 100%;
+  border-radius: 12px;
+  object-fit: contain;
+}
+
+.debug-text {
+  margin: 0;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+}
+
+.data-send-back-button {
+  margin-top: 0.75rem;
+}
