@@ -1,35 +1,37 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const SERVER_BASE_URL = "https://damy90.github.io/wishing-well-gen-2/server";
+const SITE_BASE_URL = "https://damy90.github.io/wishing-well-gen-2";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
-const serverDir = join(root, "public", "server");
+const assetsDir = join(root, "public", "assets");
+const staleServerDir = join(root, "public", "server");
 
-const assets = [
-  { name: "greeting.json", type: "json" },
-  { name: "logo.jpg", type: "binary" },
-];
+mkdirSync(assetsDir, { recursive: true });
 
-mkdirSync(serverDir, { recursive: true });
+if (existsSync(staleServerDir)) {
+  rmSync(staleServerDir, { recursive: true, force: true });
+}
 
-for (const asset of assets) {
-  const url = `${SERVER_BASE_URL}/${asset.name}`;
+async function fetchLogo(url) {
   const response = await fetch(url);
   if (!response.ok) {
-    console.error(`Failed to fetch ${url} (${response.status})`);
-    process.exit(1);
+    return null;
   }
-
-  const dest = join(serverDir, asset.name);
-  if (asset.type === "json") {
-    const data = await response.json();
-    writeFileSync(dest, `${JSON.stringify(data, null, 2)}\n`);
-  } else {
-    const data = Buffer.from(await response.arrayBuffer());
-    writeFileSync(dest, data);
-  }
-
-  console.log(`Fetched ${url} → public/server/${asset.name}`);
+  return Buffer.from(await response.arrayBuffer());
 }
+
+let data = await fetchLogo(`${SITE_BASE_URL}/assets/logo.jpg`);
+if (!data) {
+  data = await fetchLogo(`${SITE_BASE_URL}/server/logo.jpg`);
+}
+if (!data) {
+  console.error(`Failed to fetch logo from ${SITE_BASE_URL}/assets/logo.jpg`);
+  process.exit(1);
+}
+
+const dest = join(assetsDir, "logo.jpg");
+writeFileSync(dest, data);
+
+console.log(`Fetched logo → public/assets/logo.jpg`);

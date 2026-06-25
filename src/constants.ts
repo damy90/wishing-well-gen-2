@@ -13,7 +13,7 @@ export const STATUS_SHARE_FAILED =
 export const STARTUP_FB_UNAVAILABLE =
   "Facebook SDK not connected — receive via ?wish= in the URL; Send shares a link.";
 
-export const DEFAULT_PLAYER_NAME = "Guest";
+export const DEFAULT_PLAYER_NAME = "anonymous";
 
 /** Milliseconds before showing the UI when FBInstant init hangs outside Facebook. */
 export const FB_INIT_TIMEOUT_MS = 10_000;

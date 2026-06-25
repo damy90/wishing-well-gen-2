@@ -1,4 +1,4 @@
-import { SHARE_INTENT, shareText } from "../constants";
+import { DEFAULT_PLAYER_NAME, SHARE_INTENT, shareText } from "../constants";
 import { shareWishUrl } from "../url-fallback";
 import { installDevMock } from "./dev-mock";
 import { formatShareErrorMessage } from "./sdk-error";
@@ -53,7 +53,7 @@ export async function initFacebook(): Promise<WishEntryData | null> {
 
 export function getPlayerName(): string {
   const sdk = getSDK();
-  return sdk.player.getName()?.trim() || "Guest";
+  return sdk.player.getName()?.trim() || DEFAULT_PLAYER_NAME;
 }
 
 export async function shareWish(wish: string): Promise<void> {

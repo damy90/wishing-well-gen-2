@@ -1,6 +1,6 @@
 # Wishing Well Gen 2
 
-A minimal Facebook Instant Game and self-hosted web app. Send a personal whish to a friend; when they open your share, they see it in **I whish you:**. Logo and greeting text are loaded from [https://damy90.github.io/wishing-well-gen-2/](https://damy90.github.io/wishing-well-gen-2/) (`server/greeting.json` and `server/logo.jpg`).
+A minimal Facebook Instant Game and self-hosted web app. Send a personal whish to a friend; when they open your share, they see it in **I whish you:**. Greeting text and logo are loaded from [https://damy90.github.io/wishing-well-gen-2/](https://damy90.github.io/wishing-well-gen-2/) (`data/greeting.json` and `assets/logo.jpg`).
 
 ## Local development
 
@@ -28,20 +28,20 @@ Copy `.env.example` to `.env` and set your values:
 
 ## Deploy GitHub Pages (self-hosted side)
 
-Server assets are hosted at:
+Live assets are hosted at:
 
-- `https://damy90.github.io/wishing-well-gen-2/server/greeting.json`
-- `https://damy90.github.io/wishing-well-gen-2/server/logo.jpg`
+- `https://damy90.github.io/wishing-well-gen-2/data/greeting.json`
+- `https://damy90.github.io/wishing-well-gen-2/assets/logo.jpg`
 
-The app fetches these at runtime. `build:github-pages` syncs them from the live site into `dist/server/` before deploy.
+The app fetches greeting JSON at runtime. Edit [`data/greeting.json`](data/greeting.json) in the repo; `build:github-pages` copies it into `dist/data/` and syncs the logo into `dist/assets/`.
 
 1. Push this repo to GitHub.
 2. In **Settings → Pages**, set source to the **`gh-pages`** branch, folder **`/` (root)**.
 3. Push to `main` (or run the **Deploy GitHub Pages** workflow manually). The workflow builds and publishes `dist/` to `gh-pages`.
 4. Verify these URLs load:
    - `https://damy90.github.io/wishing-well-gen-2/`
-   - `https://damy90.github.io/wishing-well-gen-2/server/greeting.json`
-   - `https://damy90.github.io/wishing-well-gen-2/server/logo.jpg`
+   - `https://damy90.github.io/wishing-well-gen-2/data/greeting.json`
+   - `https://damy90.github.io/wishing-well-gen-2/assets/logo.jpg`
 
 To build locally:
 
@@ -49,7 +49,7 @@ To build locally:
 npm run build:github-pages
 ```
 
-Output: `dist/` with `index.html` and `server/` assets synced from the live site.
+Output: `dist/` with `index.html`, `data/greeting.json`, and `assets/logo.jpg`.
 
 ## Build for Facebook Instant Games
 
@@ -71,10 +71,13 @@ Zip layout (required):
 dist.zip
 ├── index.html
 ├── fbapp-config.json
-└── assets/
-    ├── index-*.js
-    └── index-*.css
+├── assets/
+│   ├── index-*.js
+│   ├── index-*.css
+│   └── logo.jpg
 ```
+
+The Facebook build bundles the logo locally (FB WebView blocks cross-origin images). Greeting JSON is **not** bundled — the instant game fetches live `data/greeting.json` from GitHub Pages at runtime.
 
 ### Meta Developer setup
 
@@ -89,7 +92,7 @@ dist.zip
 
 1. **Sender:** type a whish → **Send** → pick a friend in the share dialog.
 2. **Recipient:** open the **shared link** (not the game from the menu) and confirm **I whish you:** shows the text.
-3. **Greeting:** confirm **Hello {name}** uses the Facebook player name and logo loads from GitHub Pages.
+3. **Greeting:** confirm **Hello {name}** uses the Facebook player name and logo loads from the bundled `assets/logo.jpg`.
 
 ### Embedded self-hosted test (optional)
 
@@ -103,8 +106,8 @@ https://www.facebook.com/embed/instantgames/YOUR_GAME_ID/player?game_url=https:/
 
 | Feature | Facebook Instant Game | Self-hosted / GitHub Pages |
 |---------|----------------------|----------------------------|
-| Greeting | `FBInstant.player.getName()` + template from live `server/greeting.json` | `?user=` or **Guest** + same template |
-| Logo | Fetched from live `server/logo.jpg` | Same |
+| Greeting | `FBInstant.player.getName()` + template from live `data/greeting.json` | `?user=` or **anonymous** + same template |
+| Logo | Bundled `assets/logo.jpg` | Fetched from live `assets/logo.jpg` |
 | Receive whish | `FBInstant.getEntryPointData().wish` | `?wish=` query param |
 | Send whish | `FBInstant.shareAsync({ data: { wish } })` | Web Share API or clipboard link |
 
@@ -115,15 +118,16 @@ On successful send, the text box is cleared.
 - Zip must contain `index.html` at the **root**, not inside a subfolder.
 - `fbapp-config.json` must be in the zip root next to `index.html`.
 - Recipients must open the **shared link** to receive the whish via `getEntryPointData()`.
-- Facebook build fetches server assets from `https://damy90.github.io/wishing-well-gen-2` by default.
+- Facebook build fetches greeting JSON from `https://damy90.github.io/wishing-well-gen-2/data/greeting.json` at runtime (not bundled in the zip).
 - GitHub Pages project sites need `GITHUB_PAGES_BASE` to match the repo name (e.g. `/wishing-well-gen-2/`).
 
 ## Project layout
 
 ```
-scripts/sync-server-assets.mjs  # Pulls server/ assets from live GitHub Pages for deploy
-public/server/                  # Generated; not committed
-src/               # TypeScript app
-scripts/           # build-facebook.mjs (dist.zip), build-github-pages.mjs
-fbapp-config.json  # Instant Games platform config
+data/greeting.json              # Greeting template; deployed to dist/data/ on GitHub Pages
+scripts/sync-server-assets.mjs  # Pulls logo from live GitHub Pages for build
+public/assets/                  # Generated logo; not committed
+src/                            # TypeScript app
+scripts/                        # build-facebook.mjs (dist.zip), build-github-pages.mjs
+fbapp-config.json               # Instant Games platform config
 ```

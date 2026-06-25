@@ -3,4 +3,4 @@ dist/
 dist.zip
 .env
 .self-hosted-certs/
-public/server/
+public/assets/

@@ -6,21 +6,29 @@ export interface GreetingConfig {
 
 const DEFAULT_GREETING_TEMPLATE = "Hello {name}";
 
-function serverAssetPath(filename: string): string {
+function dataAssetPath(filename: string): string {
   const base = getServerBaseUrl();
   if (base) {
-    return `${base}/server/${filename}`;
+    return `${base}/data/${filename}`;
   }
-  return `./server/${filename}`;
+  return `./data/${filename}`;
 }
 
-/** Logo URL for the img src. Facebook build uses bundled ./server/logo.jpg. */
+function assetsPath(filename: string): string {
+  const base = getServerBaseUrl();
+  if (base) {
+    return `${base}/assets/${filename}`;
+  }
+  return `./assets/${filename}`;
+}
+
+/** Logo URL for the img src. Facebook build uses bundled ./assets/logo.jpg. */
 export function getLogoUrl(): string {
   const bundled = import.meta.env.VITE_LOGO_SRC?.trim();
   if (bundled) {
     return bundled;
   }
-  return serverAssetPath("logo.jpg");
+  return assetsPath("logo.jpg");
 }
 
 async function fetchJson(url: string): Promise<GreetingConfig | null> {
@@ -36,14 +44,9 @@ async function fetchJson(url: string): Promise<GreetingConfig | null> {
 }
 
 export async function fetchGreetingTemplate(): Promise<string> {
-  const remote = await fetchJson(serverAssetPath("greeting.json"));
+  const remote = await fetchJson(dataAssetPath("greeting.json"));
   if (remote?.template?.trim()) {
     return remote.template.trim();
-  }
-
-  const bundled = await fetchJson("./server/greeting.json");
-  if (bundled?.template?.trim()) {
-    return bundled.template.trim();
   }
 
   return DEFAULT_GREETING_TEMPLATE;
