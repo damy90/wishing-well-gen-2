@@ -1,0 +1,1 @@
+import"./styles-BXV-nAqi.js";const n=2e3,t=document.getElementById("debug-status"),a=document.getElementById("data-meta"),d=document.getElementById("data-display");function o(){d.replaceChildren(),a.hidden=!0}async function e(){{t.textContent="VITE_API_BASE_URL is not set.";return}}o();t.textContent="Waiting for data…";e();setInterval(()=>{e()},n);

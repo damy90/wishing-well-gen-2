@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wishing Well</title>
     <script src="https://connect.facebook.net/en_US/fbinstant.7.1.js"></script>
-    <script type="module" crossorigin src="/wishing-well-gen-2/assets/index-BoPsK562.js"></script>
-    <link rel="stylesheet" crossorigin href="/wishing-well-gen-2/assets/index-C8cHhPdI.css">
+    <script type="module" crossorigin src="/wishing-well-gen-2/assets/main-BueOkcW3.js"></script>
+    <link rel="modulepreload" crossorigin href="/wishing-well-gen-2/assets/styles-BXV-nAqi.js">
+    <link rel="stylesheet" crossorigin href="/wishing-well-gen-2/assets/styles-DYzdT_eZ.css">
   </head>
   <body>
     <p id="loading-indicator" class="loading" aria-live="polite">
@@ -32,6 +33,16 @@
         <h2 id="data-receive-heading">Receiving data</h2>
         <p id="data-receive-status" class="data-receive-status" aria-live="polite">Waiting…</p>
         <img id="data-success-image" class="data-success-image" alt="Data loaded successfully" hidden />
+        <button
+          id="data-send-back-button"
+          type="button"
+          class="send-button data-send-back-button"
+          hidden
+          disabled
+        >
+          Send data back
+        </button>
+        <p id="data-send-back-status" class="data-receive-status" hidden></p>
       </section>
 
       <section class="card" aria-labelledby="send-heading">
