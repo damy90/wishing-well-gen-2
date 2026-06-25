@@ -13,6 +13,9 @@ export const STATUS_SHARE_FAILED =
 export const STARTUP_FB_UNAVAILABLE =
   "Facebook SDK not connected — receive via ?wish= in the URL; Send shares a link.";
 
+export const DATA_IMAGE_WAITING = "Waiting…";
+export const DATA_IMAGE_FAILED = "Failed to load data.";
+
 export const DEFAULT_PLAYER_NAME = "anonymous";
 
 /** Milliseconds before showing the UI when FBInstant init hangs outside Facebook. */

@@ -52,6 +52,23 @@ export async function fetchGreetingTemplate(): Promise<string> {
   return DEFAULT_GREETING_TEMPLATE;
 }
 
+export function getDataSuccessImageUrl(): string {
+  return dataAssetPath("success.jpeg");
+}
+
+export async function fetchRemoteImageObjectUrl(url: string): Promise<string | null> {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      return null;
+    }
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchServerData(): Promise<{
   greeting: GreetingConfig;
   logoUrl: string;

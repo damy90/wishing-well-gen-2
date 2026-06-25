@@ -146,6 +146,25 @@ body {
   font-style: italic;
 }
 
+.data-receive-status {
+  margin: 0;
+  font-size: 1rem;
+  color: rgba(240, 244, 248, 0.55);
+  font-style: italic;
+}
+
+.data-receive-status--error {
+  color: #f87171;
+  font-style: normal;
+}
+
+.data-success-image {
+  display: block;
+  max-width: 100%;
+  border-radius: 12px;
+  object-fit: contain;
+}
+
 .send-form {
   display: flex;
   flex-direction: column;

@@ -9,6 +9,8 @@ const logoPath = join(distDir, "assets", "logo.jpg");
 const dataDir = join(distDir, "data");
 const greetingSrc = join(root, "data", "greeting.json");
 const greetingDest = join(dataDir, "greeting.json");
+const successImageSrc = join(root, "data", "success.jpeg");
+const successImageDest = join(dataDir, "success.jpeg");
 
 if (!existsSync(distDir)) {
   console.error("dist/ not found. Run vite build --config vite.github-pages.config.ts first.");
@@ -25,10 +27,17 @@ if (!existsSync(greetingSrc)) {
   process.exit(1);
 }
 
+if (!existsSync(successImageSrc)) {
+  console.error("data/success.jpeg not found.");
+  process.exit(1);
+}
+
 mkdirSync(dataDir, { recursive: true });
 copyFileSync(greetingSrc, greetingDest);
+copyFileSync(successImageSrc, successImageDest);
 
 console.log("GitHub Pages build ready in dist/");
 console.log("  dist/index.html");
 console.log("  dist/data/greeting.json");
+console.log("  dist/data/success.jpeg");
 console.log("  dist/assets/logo.jpg");

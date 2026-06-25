@@ -1,4 +1,8 @@
-import { EMPTY_WISH_MESSAGE } from "./constants";
+import { DATA_IMAGE_FAILED, DATA_IMAGE_WAITING, EMPTY_WISH_MESSAGE } from "./constants";
+import {
+  fetchRemoteImageObjectUrl,
+  getDataSuccessImageUrl,
+} from "./server-data";
 
 function getAppElement(): HTMLElement {
   return document.querySelector(".app")!;
@@ -40,6 +44,8 @@ export interface AppElements {
   logo: HTMLImageElement;
   greeting: HTMLElement;
   wishDisplay: HTMLElement;
+  dataReceiveStatus: HTMLElement;
+  dataSuccessImage: HTMLImageElement;
   wishInput: HTMLTextAreaElement;
   sendButton: HTMLButtonElement;
   sendForm: HTMLFormElement;
@@ -51,6 +57,8 @@ export function getElements(): AppElements {
     logo: document.getElementById("logo") as HTMLImageElement,
     greeting: document.getElementById("greeting")!,
     wishDisplay: document.getElementById("wish-display")!,
+    dataReceiveStatus: document.getElementById("data-receive-status")!,
+    dataSuccessImage: document.getElementById("data-success-image") as HTMLImageElement,
     wishInput: document.getElementById("wish-input") as HTMLTextAreaElement,
     sendButton: document.getElementById("send-button") as HTMLButtonElement,
     sendForm: document.getElementById("send-form") as HTMLFormElement,
@@ -75,6 +83,31 @@ export function displayWish(wishDisplay: HTMLElement, wish: string | undefined):
     wishDisplay.textContent = EMPTY_WISH_MESSAGE;
     wishDisplay.classList.add("wish-display--empty");
   }
+}
+
+export async function loadDataSuccessImage(
+  statusEl: HTMLElement,
+  img: HTMLImageElement,
+): Promise<void> {
+  statusEl.textContent = DATA_IMAGE_WAITING;
+  statusEl.hidden = false;
+  statusEl.classList.remove("data-receive-status--error");
+  img.hidden = true;
+  img.removeAttribute("src");
+
+  const objectUrl = await fetchRemoteImageObjectUrl(getDataSuccessImageUrl());
+  if (!objectUrl) {
+    statusEl.textContent = DATA_IMAGE_FAILED;
+    statusEl.classList.add("data-receive-status--error");
+    return;
+  }
+
+  img.onload = () => {
+    URL.revokeObjectURL(objectUrl);
+  };
+  img.src = objectUrl;
+  img.hidden = false;
+  statusEl.hidden = true;
 }
 
 export function updateSendButton(

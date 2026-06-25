@@ -21,6 +21,7 @@ import {
   hideApp,
   hideLoading,
   hideStartupBanner,
+  loadDataSuccessImage,
   revealApp,
   showStartupBanner,
 } from "./ui";
@@ -82,6 +83,7 @@ async function main(): Promise<void> {
 
   const elements = getElements();
   displayLogo(elements.logo, getLogoUrl());
+  void loadDataSuccessImage(elements.dataReceiveStatus, elements.dataSuccessImage);
 
   const [greetingTemplate, startup] = await Promise.all([
     fetchGreetingTemplate(),
@@ -101,6 +103,7 @@ main().catch(() => {
   try {
     const elements = getElements();
     displayLogo(elements.logo, getLogoUrl());
+    void loadDataSuccessImage(elements.dataReceiveStatus, elements.dataSuccessImage);
     displayGreeting(
       elements.greeting,
       formatGreeting(DEFAULT_GREETING_TEMPLATE, DEFAULT_PLAYER_NAME),
