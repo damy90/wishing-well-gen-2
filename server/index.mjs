@@ -78,3 +78,12 @@ const server = createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log(`Receive API listening on http://localhost:${PORT}`);
 });
+
+server.on("error", (err) => {
+  if (err.code === "EADDRINUSE") {
+    console.error(`Port ${PORT} is already in use. Stop the other process or set PORT to a free port.`);
+    console.error(`  lsof -i :${PORT}   # find PID, then: kill <PID>`);
+    process.exit(1);
+  }
+  throw err;
+});

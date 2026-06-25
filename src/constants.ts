@@ -37,6 +37,9 @@ export const SHARE_SUBTITLE = "I whish you something special!";
 /** Canonical server assets host (GitHub Pages). */
 export const SERVER_BASE_URL = "https://damy90.github.io/wishing-well-gen-2";
 
+/** Default receive API in local dev when VITE_API_BASE_URL is unset. */
+export const DEV_API_BASE_URL = "http://localhost:3001";
+
 export const CSS_VARS = {
   colorText: "--color-text",
   colorAccent: "--color-accent",
@@ -60,5 +63,11 @@ export function getServerBaseUrl(): string {
 /** Receive API origin (separate Node deploy). */
 export function getApiBaseUrl(): string {
   const base = import.meta.env.VITE_API_BASE_URL?.trim();
-  return base ? base.replace(/\/$/, "") : "";
+  if (base) {
+    return base.replace(/\/$/, "");
+  }
+  if (import.meta.env.DEV) {
+    return DEV_API_BASE_URL;
+  }
+  return "";
 }

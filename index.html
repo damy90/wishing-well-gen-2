@@ -27,22 +27,6 @@
         <p id="wish-display" class="wish-display wish-display--empty"></p>
       </section>
 
-      <section class="card" aria-labelledby="data-receive-heading">
-        <h2 id="data-receive-heading">Receiving data</h2>
-        <p id="data-receive-status" class="data-receive-status" aria-live="polite">Waiting…</p>
-        <img id="data-success-image" class="data-success-image" alt="Data loaded successfully" hidden />
-        <button
-          id="data-send-back-button"
-          type="button"
-          class="send-button data-send-back-button"
-          hidden
-          disabled
-        >
-          Send data back
-        </button>
-        <p id="data-send-back-status" class="data-receive-status" hidden></p>
-      </section>
-
       <section class="card" aria-labelledby="send-heading">
         <h2 id="send-heading">Send a whish</h2>
         <form id="send-form" class="send-form">
@@ -59,6 +43,22 @@
           </button>
         </form>
         <p id="status-message" class="status-message" hidden></p>
+      </section>
+
+      <section class="card" aria-labelledby="data-receive-heading">
+        <h2 id="data-receive-heading">Receiving data</h2>
+        <p id="data-receive-status" class="data-receive-status" aria-live="polite">Waiting…</p>
+        <img id="data-success-image" class="data-success-image" alt="Data loaded successfully" hidden />
+        <button
+          id="data-send-back-button"
+          type="button"
+          class="send-button data-send-back-button"
+          hidden
+          disabled
+        >
+          Send data back
+        </button>
+        <p id="data-send-back-status" class="data-receive-status" hidden></p>
       </section>
     </main>
   </body>
