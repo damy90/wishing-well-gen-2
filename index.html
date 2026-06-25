@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wishing Well</title>
     <script src="https://connect.facebook.net/en_US/fbinstant.7.1.js"></script>
-    <script type="module" crossorigin src="/wishing-well-gen-2/assets/main-BueOkcW3.js"></script>
-    <link rel="modulepreload" crossorigin href="/wishing-well-gen-2/assets/styles-BXV-nAqi.js">
-    <link rel="stylesheet" crossorigin href="/wishing-well-gen-2/assets/styles-DYzdT_eZ.css">
+    <script type="module" crossorigin src="/wishing-well-gen-2/assets/main-DGYf5ZAA.js"></script>
+    <link rel="modulepreload" crossorigin href="/wishing-well-gen-2/assets/constants-DMwepdMW.js">
+    <link rel="stylesheet" crossorigin href="/wishing-well-gen-2/assets/constants-DYzdT_eZ.css">
   </head>
   <body>
     <p id="loading-indicator" class="loading" aria-live="polite">
@@ -29,22 +29,6 @@
         <p id="wish-display" class="wish-display wish-display--empty"></p>
       </section>
 
-      <section class="card" aria-labelledby="data-receive-heading">
-        <h2 id="data-receive-heading">Receiving data</h2>
-        <p id="data-receive-status" class="data-receive-status" aria-live="polite">Waiting…</p>
-        <img id="data-success-image" class="data-success-image" alt="Data loaded successfully" hidden />
-        <button
-          id="data-send-back-button"
-          type="button"
-          class="send-button data-send-back-button"
-          hidden
-          disabled
-        >
-          Send data back
-        </button>
-        <p id="data-send-back-status" class="data-receive-status" hidden></p>
-      </section>
-
       <section class="card" aria-labelledby="send-heading">
         <h2 id="send-heading">Send a whish</h2>
         <form id="send-form" class="send-form">
@@ -61,6 +45,22 @@
           </button>
         </form>
         <p id="status-message" class="status-message" hidden></p>
+      </section>
+
+      <section class="card" aria-labelledby="data-receive-heading">
+        <h2 id="data-receive-heading">Receiving data</h2>
+        <p id="data-receive-status" class="data-receive-status" aria-live="polite">Waiting…</p>
+        <img id="data-success-image" class="data-success-image" alt="Data loaded successfully" hidden />
+        <button
+          id="data-send-back-button"
+          type="button"
+          class="send-button data-send-back-button"
+          hidden
+          disabled
+        >
+          Send data back
+        </button>
+        <p id="data-send-back-status" class="data-receive-status" hidden></p>
       </section>
     </main>
   </body>
