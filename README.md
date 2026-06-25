@@ -31,14 +31,15 @@ Copy `.env.example` to `.env` and set your values:
 |----------|---------|
 | `GITHUB_PAGES_BASE` | Base path for GitHub Pages build (default `/wishing-well-gen-2/`) |
 | `VITE_SERVER_BASE_URL` | Server assets origin (default `https://damy90.github.io/wishing-well-gen-2`) |
-| `VITE_API_BASE_URL` | Receive API origin for **Send data back** and `debug.html` (default dev: `http://localhost:3001`) |
+| `VITE_API_BASE_URL` | Receive API origin for **Send data back** and `debug.html` (dev default: `http://localhost:3001`; production: your Render URL) |
 
 ## Receive API (Node server)
 
-GitHub Pages is static-only. The receive API runs as a separate Node process (`server/index.mjs`):
+GitHub Pages is static-only. The receive API runs as a separate Node process ([`server/index.mjs`](server/index.mjs)):
 
 | Route | Method | Purpose |
 |-------|--------|---------|
+| `/health` | GET | Health check (Render) |
 | `/api/receive` | POST | Store latest payload (raw body + `Content-Type`) |
 | `/api/receive/latest?after=<ms>` | GET | Return payload received after timestamp, or 204 |
 
@@ -46,9 +47,61 @@ GitHub Pages is static-only. The receive API runs as a separate Node process (`s
 npm run server
 ```
 
-Deploy to Render, Railway, or similar. Set `VITE_API_BASE_URL` to that origin before `build:facebook` so the instant game can POST cross-origin (CORS is enabled).
-
 **Debug page:** `https://damy90.github.io/wishing-well-gen-2/debug.html` polls the API and renders image, JSON, plain text, or `type: blob` by content type. The data field is empty on reload until new data arrives after page open.
+
+## Deploy receive API on Render
+
+The repo includes [`render.yaml`](render.yaml) (Render Blueprint) for the receive API only.
+
+### 1. Create the Render service
+
+1. Sign in at [render.com](https://render.com) and connect your GitHub account.
+2. **New → Blueprint** (or **New → Web Service** and point at this repo).
+3. Select this repository. Render reads `render.yaml` and creates **`wishing-well-receive-api`**.
+4. Confirm settings:
+   - **Build command:** `npm install`
+   - **Start command:** `npm start`
+   - **Health check path:** `/health`
+5. Deploy. When live, note the URL, e.g. `https://wishing-well-receive-api.onrender.com` (no trailing slash).
+
+Verify:
+
+```bash
+curl https://YOUR-SERVICE.onrender.com/health
+# → {"ok":true}
+```
+
+**Free tier note:** the service sleeps after inactivity; the first request may take ~30s to wake up.
+
+### 2. Wire the URL into builds
+
+Production builds need `VITE_API_BASE_URL` set at **build time** (it is baked into the JS bundle).
+
+**GitHub Pages (CI):**
+
+1. GitHub repo → **Settings → Secrets and variables → Actions**
+2. Add secret **`VITE_API_BASE_URL`** = `https://YOUR-SERVICE.onrender.com`
+3. Push to `main` or re-run **Deploy GitHub Pages** — the workflow passes this into `build:github-pages`.
+
+**Facebook build (local):**
+
+```bash
+VITE_API_BASE_URL=https://YOUR-SERVICE.onrender.com npm run build:facebook
+```
+
+Or add to `.env`:
+
+```
+VITE_API_BASE_URL=https://YOUR-SERVICE.onrender.com
+```
+
+Then `npm run build:facebook` and upload `dist.zip` to Meta Web Hosting.
+
+### 3. Test end-to-end
+
+1. Open `https://damy90.github.io/wishing-well-gen-2/` (after redeploy with the secret set).
+2. Wait for **Receiving data** image → click **Send data back**.
+3. Open `https://damy90.github.io/wishing-well-gen-2/debug.html` — image should appear within a few seconds.
 
 ## Deploy GitHub Pages (self-hosted side)
 
@@ -147,12 +200,14 @@ On successful send, the text box is cleared.
 - Recipients must open the **shared link** to receive the whish via `getEntryPointData()`.
 - Facebook build fetches greeting JSON from `https://damy90.github.io/wishing-well-gen-2/data/greeting.json` at runtime (not bundled in the zip).
 - GitHub Pages project sites need `GITHUB_PAGES_BASE` to match the repo name (e.g. `/wishing-well-gen-2/`).
+- **Send data back** is hidden in production unless `VITE_API_BASE_URL` is set when building. See [Deploy receive API on Render](#deploy-receive-api-on-render).
 
 ## Project layout
 
 ```
 data/greeting.json              # Greeting template; deployed to dist/data/ on GitHub Pages
 server/index.mjs                # Receive API (POST /api/receive)
+render.yaml                     # Render Blueprint for the receive API
 debug.html                      # Debug page for received payloads
 scripts/sync-server-assets.mjs  # Pulls logo from live GitHub Pages for build
 public/assets/                  # Generated logo; not committed

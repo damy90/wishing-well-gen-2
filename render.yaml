@@ -1,0 +1,14 @@
+# Render Blueprint — receive API only (GitHub Pages hosts the static app).
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: wishing-well-receive-api
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production

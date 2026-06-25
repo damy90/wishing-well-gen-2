@@ -42,6 +42,11 @@ const server = createServer(async (req, res) => {
     return;
   }
 
+  if (method === "GET" && url === "/health") {
+    sendJson(res, 200, { ok: true });
+    return;
+  }
+
   if (method === "POST" && url === "/api/receive") {
     try {
       const buffer = await readBody(req);
