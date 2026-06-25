@@ -4,7 +4,7 @@ export interface GreetingConfig {
   template: string;
 }
 
-const DEFAULT_GREETING_TEMPLATE = "Hello {name}";
+export const DEFAULT_GREETING_TEMPLATE = "Hello {name} (fallback)";
 
 function dataAssetPath(filename: string): string {
   const base = getServerBaseUrl();

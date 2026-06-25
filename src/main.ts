@@ -6,7 +6,11 @@ import {
   initFacebook,
   useUrlFallback,
 } from "./facebook";
-import { fetchGreetingTemplate, getLogoUrl } from "./server-data";
+import {
+  DEFAULT_GREETING_TEMPLATE,
+  fetchGreetingTemplate,
+  getLogoUrl,
+} from "./server-data";
 import { wireSendForm } from "./send-form";
 import { getUserFromUrl, getWishFromUrl } from "./url-fallback";
 import {
@@ -97,7 +101,10 @@ main().catch(() => {
   try {
     const elements = getElements();
     displayLogo(elements.logo, getLogoUrl());
-    displayGreeting(elements.greeting, formatGreeting("Hello {name}", DEFAULT_PLAYER_NAME));
+    displayGreeting(
+      elements.greeting,
+      formatGreeting(DEFAULT_GREETING_TEMPLATE, DEFAULT_PLAYER_NAME),
+    );
     revealWithUi({ wish: getWishFromUrl() }, true);
   } catch {
     hideLoading();
