@@ -118,6 +118,14 @@ body {
   letter-spacing: 0.02em;
 }
 
+.app-player-context {
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--color-accent);
+  white-space: pre-line;
+}
+
 .card {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);

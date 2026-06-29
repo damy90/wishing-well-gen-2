@@ -7,7 +7,7 @@ export const omitFbInstantInDevPlugin: Plugin = {
     handler(html, ctx) {
       if (ctx.server) {
         return html.replace(
-          /\s*<script src="https:\/\/connect\.facebook\.net\/en_US\/fbinstant\.7\.1\.js"><\/script>\n?/,
+          /\s*<script src="https:\/\/connect\.facebook\.net\/en_US\/fbinstant\.8\.0\.js"><\/script>\n?/,
           "\n",
         );
       }

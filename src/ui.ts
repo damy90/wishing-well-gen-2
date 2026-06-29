@@ -1,4 +1,4 @@
-import { DATA_IMAGE_FAILED, DATA_IMAGE_WAITING, EMPTY_WISH_MESSAGE } from "./constants";
+import { DATA_IMAGE_FAILED, DATA_IMAGE_WAITING, EMPTY_WISH_MESSAGE, LOCATION_UNKNOWN } from "./constants";
 import { getDataSuccessImageUrl } from "./server-data";
 
 function getAppElement(): HTMLElement {
@@ -40,6 +40,7 @@ export function hideLoading(): void {
 export interface AppElements {
   logo: HTMLImageElement;
   greeting: HTMLElement;
+  playerContext: HTMLElement;
   wishDisplay: HTMLElement;
   dataReceiveStatus: HTMLElement;
   dataSuccessImage: HTMLImageElement;
@@ -55,6 +56,7 @@ export function getElements(): AppElements {
   return {
     logo: document.getElementById("logo") as HTMLImageElement,
     greeting: document.getElementById("greeting")!,
+    playerContext: document.getElementById("player-context")!,
     wishDisplay: document.getElementById("wish-display")!,
     dataReceiveStatus: document.getElementById("data-receive-status")!,
     dataSuccessImage: document.getElementById("data-success-image") as HTMLImageElement,
@@ -74,6 +76,20 @@ export function displayLogo(logo: HTMLImageElement, logoUrl: string): void {
 
 export function displayGreeting(greetingEl: HTMLElement, text: string): void {
   greetingEl.textContent = text;
+}
+
+export function displayPlayerContext(
+  playerContextEl: HTMLElement,
+  location: string | null,
+  locale: string | null,
+): void {
+  const lines = [location ? `Location: ${location}` : LOCATION_UNKNOWN];
+  if (locale) {
+    lines.push(`Language: ${locale}`);
+  }
+
+  playerContextEl.textContent = lines.join("\n");
+  playerContextEl.hidden = false;
 }
 
 export function displayWish(wishDisplay: HTMLElement, wish: string | undefined): void {

@@ -22,8 +22,16 @@ export const DATA_SEND_BACK_FAILED = "Failed to send data.";
 
 export const DEFAULT_PLAYER_NAME = "anonymous";
 
+export const LOCATION_UNKNOWN = "Location: unknown";
+
 /** Milliseconds before showing the UI when FBInstant init hangs outside Facebook. */
-export const FB_INIT_TIMEOUT_MS = 10_000;
+export const FB_INIT_TIMEOUT_MS = import.meta.env.DEV ? 10_000 : 30_000;
+
+/** Max wait for FBInstant to appear on window before init (production only). */
+export const FB_SDK_WAIT_MS = 5_000;
+
+/** Max wait for document.fonts.ready during FB loading progress. */
+export const FONTS_READY_TIMEOUT_MS = 3_000;
 
 /** Required by Facebook Web Hosting shareAsync validation (SDK 7.1 host). */
 export const SHARE_INTENT = "SHARE" as const;

@@ -1,4 +1,11 @@
-import { DEFAULT_PLAYER_NAME, SHARE_INTENT, shareText } from "../constants";
+import {
+  DEFAULT_PLAYER_NAME,
+  FB_INIT_TIMEOUT_MS,
+  FB_SDK_WAIT_MS,
+  FONTS_READY_TIMEOUT_MS,
+  SHARE_INTENT,
+  shareText,
+} from "../constants";
 import { shareWishUrl } from "../url-fallback";
 import { installDevMock } from "./dev-mock";
 import { formatShareErrorMessage } from "./sdk-error";
@@ -8,6 +15,8 @@ import type { FBInstantSDK, WishEntryData } from "./types";
 export type { SharePayload, WishEntryData } from "./types";
 export { formatShareErrorMessage };
 
+const FB_SDK_POLL_MS = 50;
+
 let urlFallbackActive = false;
 
 export function useUrlFallback(): void {
@@ -16,6 +25,11 @@ export function useUrlFallback(): void {
 
 export function isUrlFallbackActive(): boolean {
   return urlFallbackActive;
+}
+
+export function logStartupFailure(error: unknown): void {
+  const detail = error instanceof Error ? error.message : String(error);
+  console.warn("[FBInstant] init failed:", detail, error);
 }
 
 function getSDK(): FBInstantSDK {
@@ -29,19 +43,35 @@ function getSDK(): FBInstantSDK {
   return window.FBInstant;
 }
 
+async function waitForFBInstant(deadlineMs: number): Promise<void> {
+  const deadline = Date.now() + deadlineMs;
+  while (!window.FBInstant) {
+    if (Date.now() >= deadline) {
+      throw new Error("FBInstant SDK is not available.");
+    }
+    await new Promise((resolve) => setTimeout(resolve, FB_SDK_POLL_MS));
+  }
+}
+
 async function runInitialLoad(
   onProgress: (progress: number) => void,
 ): Promise<void> {
   onProgress(10);
 
   if (document.fonts?.ready) {
-    await document.fonts.ready;
+    await Promise.race([
+      document.fonts.ready,
+      new Promise<void>((resolve) => setTimeout(resolve, FONTS_READY_TIMEOUT_MS)),
+    ]);
   }
 
   onProgress(90);
 }
 
 export async function initFacebook(): Promise<WishEntryData | null> {
+  if (!import.meta.env.DEV) {
+    await waitForFBInstant(FB_SDK_WAIT_MS);
+  }
   const sdk = getSDK();
   await sdk.initializeAsync();
   sdk.setLoadingProgress(0);
@@ -52,8 +82,49 @@ export async function initFacebook(): Promise<WishEntryData | null> {
 }
 
 export function getPlayerName(): string {
-  const sdk = getSDK();
-  return sdk.player.getName()?.trim() || DEFAULT_PLAYER_NAME;
+  try {
+    const sdk = getSDK();
+    const getName = sdk.player?.getName;
+    if (typeof getName !== "function") {
+      return DEFAULT_PLAYER_NAME;
+    }
+    return getName.call(sdk.player)?.trim() || DEFAULT_PLAYER_NAME;
+  } catch {
+    return DEFAULT_PLAYER_NAME;
+  }
+}
+
+export function getLocale(): string | null {
+  try {
+    const getLocaleFn = getSDK().getLocale;
+    if (typeof getLocaleFn !== "function") {
+      return null;
+    }
+    return getLocaleFn.call(getSDK())?.trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+/** Mount Meta-hosted player name (Zero Permissions SDK). Returns true if shown. */
+export async function mountPlayerNameOverlay(container: HTMLElement): Promise<boolean> {
+  if (import.meta.env.DEV || urlFallbackActive) {
+    return false;
+  }
+
+  const createOverlay = getSDK().overlayViews?.createProfileNameOverlayViewAsync;
+  if (typeof createOverlay !== "function") {
+    return false;
+  }
+
+  try {
+    const overlay = await createOverlay.call(getSDK().overlayViews, container);
+    await overlay.showAsync();
+    return true;
+  } catch (error) {
+    console.warn("[FBInstant] profile name overlay failed:", error);
+    return false;
+  }
 }
 
 export async function shareWish(wish: string): Promise<void> {

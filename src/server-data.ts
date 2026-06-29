@@ -69,6 +69,36 @@ export async function fetchRemoteImageObjectUrl(url: string): Promise<string | n
   }
 }
 
+export interface GeoLocation {
+  city: string | null;
+  region: string | null;
+  country: string | null;
+}
+
+export function formatGeoLocation(geo: GeoLocation): string | null {
+  const parts = [geo.city, geo.region, geo.country].filter(
+    (part): part is string => Boolean(part?.trim()),
+  );
+  return parts.length > 0 ? parts.join(", ") : null;
+}
+
+export async function fetchGeoLocation(): Promise<GeoLocation | null> {
+  const apiBase = getApiBaseUrl();
+  if (!apiBase) {
+    return null;
+  }
+
+  try {
+    const response = await fetch(`${apiBase}/api/geo`);
+    if (!response.ok) {
+      return null;
+    }
+    return (await response.json()) as GeoLocation;
+  } catch {
+    return null;
+  }
+}
+
 export async function postDataToApi(body: Blob): Promise<void> {
   const apiBase = getApiBaseUrl();
   if (!apiBase) {

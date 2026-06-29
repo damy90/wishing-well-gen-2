@@ -11,6 +11,76 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
+const GEO_LOOKUP_TIMEOUT_MS = 3000;
+
+function getClientIp(req) {
+  const forwarded = req.headers["x-forwarded-for"];
+  if (typeof forwarded === "string" && forwarded.trim()) {
+    return forwarded.split(",")[0].trim();
+  }
+
+  const realIp = req.headers["x-real-ip"];
+  if (typeof realIp === "string" && realIp.trim()) {
+    return realIp.trim();
+  }
+
+  return req.socket.remoteAddress?.replace(/^::ffff:/, "") ?? "";
+}
+
+function isPrivateOrLocalIp(ip) {
+  if (!ip) {
+    return true;
+  }
+
+  if (ip === "::1" || ip === "127.0.0.1" || ip === "localhost") {
+    return true;
+  }
+
+  if (ip.startsWith("10.") || ip.startsWith("192.168.") || ip.startsWith("169.254.")) {
+    return true;
+  }
+
+  if (/^172\.(1[6-9]|2\d|3[01])\./.test(ip)) {
+    return true;
+  }
+
+  return false;
+}
+
+async function lookupGeo(ip) {
+  if (isPrivateOrLocalIp(ip)) {
+    return null;
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), GEO_LOOKUP_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(
+      `http://ip-api.com/json/${encodeURIComponent(ip)}?fields=status,country,regionName,city`,
+      { signal: controller.signal },
+    );
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    if (data.status !== "success") {
+      return null;
+    }
+
+    return {
+      city: data.city || null,
+      region: data.regionName || null,
+      country: data.country || null,
+    };
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 function readBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
@@ -57,6 +127,13 @@ const server = createServer(async (req, res) => {
     } catch {
       sendJson(res, 500, { error: "Failed to read body" });
     }
+    return;
+  }
+
+  if (method === "GET" && url === "/api/geo") {
+    const ip = getClientIp(req);
+    const geo = await lookupGeo(ip);
+    sendJson(res, 200, geo ?? { city: null, region: null, country: null });
     return;
   }
 

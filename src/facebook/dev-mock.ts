@@ -18,6 +18,9 @@ export function installDevMock(): FBInstantSDK {
       const wish = getWishFromUrl();
       return wish ? { wish } : null;
     },
+    getLocale() {
+      return navigator.language.replace("-", "_");
+    },
     async shareAsync(payload) {
       console.warn("[dev] shareAsync payload", payload);
       await new Promise((r) => setTimeout(r, 300));

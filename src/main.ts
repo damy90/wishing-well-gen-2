@@ -3,13 +3,19 @@ import { DEFAULT_PLAYER_NAME, FB_INIT_TIMEOUT_MS, STARTUP_FB_UNAVAILABLE } from 
 import { wireDataSendBack } from "./data-send-back";
 import { formatGreeting } from "./greeting";
 import {
+  getLocale,
   getPlayerName,
   initFacebook,
+  isUrlFallbackActive,
+  logStartupFailure,
+  mountPlayerNameOverlay,
   useUrlFallback,
 } from "./facebook";
 import {
   DEFAULT_GREETING_TEMPLATE,
+  fetchGeoLocation,
   fetchGreetingTemplate,
+  formatGeoLocation,
   getLogoUrl,
 } from "./server-data";
 import { wireSendForm } from "./send-form";
@@ -17,6 +23,7 @@ import { getUserFromUrl, getWishFromUrl } from "./url-fallback";
 import {
   displayGreeting,
   displayLogo,
+  displayPlayerContext,
   displayWish,
   getElements,
   hideApp,
@@ -34,6 +41,8 @@ interface StartupResult {
   showBanner: boolean;
 }
 
+let startupSettled = false;
+
 function initWithTimeout(): Promise<WishEntryData | null> {
   return Promise.race([
     initFacebook(),
@@ -49,13 +58,16 @@ function initWithTimeout(): Promise<WishEntryData | null> {
 async function loadStartup(): Promise<StartupResult> {
   try {
     const entryData = await initWithTimeout();
+    startupSettled = true;
     return {
       entryData,
       playerName: getPlayerName(),
       showBanner: false,
     };
-  } catch {
+  } catch (error) {
+    logStartupFailure(error);
     useUrlFallback();
+    startupSettled = true;
     return {
       entryData: { wish: getWishFromUrl() },
       playerName: getUserFromUrl() ?? DEFAULT_PLAYER_NAME,
@@ -79,6 +91,13 @@ function revealWithUi(entryData: WishEntryData | null, showBanner: boolean): voi
   wireSendForm(elements);
 }
 
+async function loadPlayerContext(elements: ReturnType<typeof getElements>): Promise<void> {
+  const locale = getLocale();
+  const geo = await fetchGeoLocation();
+  const location = geo ? formatGeoLocation(geo) : null;
+  displayPlayerContext(elements.playerContext, location, locale);
+}
+
 async function loadDataImageAndWireSendBack(elements: ReturnType<typeof getElements>): Promise<void> {
   const blob = await loadDataSuccessImage(
     elements.dataReceiveStatus,
@@ -92,25 +111,48 @@ async function loadDataImageAndWireSendBack(elements: ReturnType<typeof getEleme
 async function main(): Promise<void> {
   hideApp();
 
+  // Meta expects initializeAsync() as early as possible — start before other fetches.
+  const startupPromise = loadStartup();
+
   const elements = getElements();
   displayLogo(elements.logo, getLogoUrl());
+  displayPlayerContext(elements.playerContext, null, getLocale());
   void loadDataImageAndWireSendBack(elements);
 
   const [greetingTemplate, startup] = await Promise.all([
     fetchGreetingTemplate(),
-    loadStartup(),
+    startupPromise,
   ]);
 
-  displayGreeting(
-    elements.greeting,
-    formatGreeting(greetingTemplate, startup.playerName),
-  );
+  if (startup.playerName === DEFAULT_PLAYER_NAME && !startup.showBanner) {
+    const placeholder = "{name}";
+    const idx = greetingTemplate.indexOf(placeholder);
+    if (idx >= 0) {
+      elements.greeting.textContent = greetingTemplate.slice(0, idx);
+      void mountPlayerNameOverlay(elements.greeting);
+    } else {
+      displayGreeting(
+        elements.greeting,
+        formatGreeting(greetingTemplate, startup.playerName),
+      );
+    }
+  } else {
+    displayGreeting(
+      elements.greeting,
+      formatGreeting(greetingTemplate, startup.playerName),
+    );
+  }
 
   revealWithUi(startup.entryData, startup.showBanner);
+  void loadPlayerContext(elements);
 }
 
-main().catch(() => {
-  useUrlFallback();
+main().catch((error) => {
+  console.warn("[startup] Critical failure:", error);
+  if (!startupSettled) {
+    logStartupFailure(error);
+    useUrlFallback();
+  }
   try {
     const elements = getElements();
     displayLogo(elements.logo, getLogoUrl());
@@ -119,7 +161,8 @@ main().catch(() => {
       elements.greeting,
       formatGreeting(DEFAULT_GREETING_TEMPLATE, DEFAULT_PLAYER_NAME),
     );
-    revealWithUi({ wish: getWishFromUrl() }, true);
+    revealWithUi({ wish: getWishFromUrl() }, isUrlFallbackActive());
+    void loadPlayerContext(elements);
   } catch {
     hideLoading();
   }

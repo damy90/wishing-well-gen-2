@@ -10,7 +10,17 @@ export interface SharePayload {
 }
 
 export interface FBInstantPlayer {
-  getName(): string | null;
+  getName?(): string | null;
+  getID?(): string | null;
+}
+
+export interface FBInstantOverlayViews {
+  createProfileNameOverlayViewAsync?(
+    domElement: HTMLElement,
+    textStyle?: string,
+    iFrameStyle?: string,
+    pathToCss?: string,
+  ): Promise<{ showAsync(): Promise<void> }>;
 }
 
 export interface FBInstantSDK {
@@ -18,8 +28,10 @@ export interface FBInstantSDK {
   startGameAsync(): Promise<void>;
   setLoadingProgress(progress: number): void;
   getEntryPointData(): WishEntryData | null;
+  getLocale?(): string;
   shareAsync(payload: SharePayload): Promise<void>;
   player: FBInstantPlayer;
+  overlayViews?: FBInstantOverlayViews;
 }
 
 declare global {
