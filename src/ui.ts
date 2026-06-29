@@ -50,6 +50,9 @@ export interface AppElements {
   sendButton: HTMLButtonElement;
   sendForm: HTMLFormElement;
   statusMessage: HTMLElement;
+  screenshotShareSection: HTMLElement;
+  screenshotShareButton: HTMLButtonElement;
+  screenshotShareStatus: HTMLElement;
 }
 
 export function getElements(): AppElements {
@@ -66,6 +69,11 @@ export function getElements(): AppElements {
     sendButton: document.getElementById("send-button") as HTMLButtonElement,
     sendForm: document.getElementById("send-form") as HTMLFormElement,
     statusMessage: document.getElementById("status-message")!,
+    screenshotShareSection: document.getElementById("screenshot-share-section")!,
+    screenshotShareButton: document.getElementById(
+      "screenshot-share-button",
+    ) as HTMLButtonElement,
+    screenshotShareStatus: document.getElementById("screenshot-share-status")!,
   };
 }
 

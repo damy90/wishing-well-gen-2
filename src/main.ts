@@ -18,6 +18,7 @@ import {
   formatGeoLocation,
   getLogoUrl,
 } from "./server-data";
+import { wireScreenshotShare } from "./screenshot-share";
 import { wireSendForm } from "./send-form";
 import { getUserFromUrl, getWishFromUrl } from "./url-fallback";
 import {
@@ -89,6 +90,7 @@ function revealWithUi(entryData: WishEntryData | null, showBanner: boolean): voi
 
   displayWish(elements.wishDisplay, entryData?.wish);
   wireSendForm(elements);
+  wireScreenshotShare(elements);
 }
 
 async function loadPlayerContext(elements: ReturnType<typeof getElements>): Promise<void> {

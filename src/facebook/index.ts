@@ -3,10 +3,11 @@ import {
   FB_INIT_TIMEOUT_MS,
   FB_SDK_WAIT_MS,
   FONTS_READY_TIMEOUT_MS,
+  SCREENSHOT_SHARE_GENERIC_TEXT,
   SHARE_INTENT,
   shareText,
 } from "../constants";
-import { shareWishUrl } from "../url-fallback";
+import { shareScreenshotUrl, shareWishUrl } from "../url-fallback";
 import { installDevMock } from "./dev-mock";
 import { formatShareErrorMessage } from "./sdk-error";
 import { createShareImage } from "./share-image";
@@ -139,6 +140,26 @@ export async function shareWish(wish: string): Promise<void> {
     text: shareText(wish),
     data: { wish },
     image: createShareImage(),
+  };
+
+  await sdk.shareAsync(payload);
+}
+
+export async function shareScreenshot(
+  imageDataUrl: string,
+  wish?: string,
+): Promise<void> {
+  if (urlFallbackActive) {
+    await shareScreenshotUrl(imageDataUrl, wish);
+    return;
+  }
+
+  const sdk = getSDK();
+  const payload = {
+    intent: SHARE_INTENT,
+    text: wish ? shareText(wish) : SCREENSHOT_SHARE_GENERIC_TEXT,
+    data: wish ? { wish } : {},
+    image: imageDataUrl,
   };
 
   await sdk.shareAsync(payload);

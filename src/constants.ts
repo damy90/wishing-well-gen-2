@@ -10,6 +10,10 @@ export const STATUS_URL_SHARED =
 export const STATUS_SHARE_FAILED =
   "Share cancelled or failed. Try again.";
 
+export const STATUS_SCREENSHOT_CAPTURING = "Capturing screenshot…";
+export const STATUS_SCREENSHOT_SHARED = "Screenshot shared!";
+export const SCREENSHOT_SHARE_GENERIC_TEXT = "Check out Wishing Well!";
+
 export const STARTUP_FB_UNAVAILABLE =
   "Facebook SDK not connected — receive via ?wish= in the URL; Send shares a link.";
 
