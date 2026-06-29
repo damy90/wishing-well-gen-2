@@ -53,6 +53,9 @@ export interface AppElements {
   screenshotShareSection: HTMLElement;
   screenshotShareButton: HTMLButtonElement;
   screenshotShareStatus: HTMLElement;
+  imageShareSection: HTMLElement;
+  imageShareButton: HTMLButtonElement;
+  imageShareStatus: HTMLElement;
 }
 
 export function getElements(): AppElements {
@@ -74,6 +77,9 @@ export function getElements(): AppElements {
       "screenshot-share-button",
     ) as HTMLButtonElement,
     screenshotShareStatus: document.getElementById("screenshot-share-status")!,
+    imageShareSection: document.getElementById("image-share-section")!,
+    imageShareButton: document.getElementById("image-share-button") as HTMLButtonElement,
+    imageShareStatus: document.getElementById("image-share-status")!,
   };
 }
 

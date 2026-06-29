@@ -1,5 +1,7 @@
 import {
   EMPTY_WISH_MESSAGE,
+  STATUS_IMAGE_SHARE_CAPTURING,
+  STATUS_IMAGE_SHARED,
   STATUS_SCREENSHOT_CAPTURING,
   STATUS_SCREENSHOT_SHARED,
   STATUS_URL_SHARED,
@@ -25,41 +27,98 @@ function readVisibleWish(wishDisplay: HTMLElement): string | undefined {
   return text;
 }
 
-export function wireScreenshotShare(elements: AppElements): void {
-  const {
-    screenshotShareButton,
-    screenshotShareSection,
-    screenshotShareStatus,
-    wishDisplay,
-  } = elements;
-  let sharing = false;
+interface ShareButtonConfig {
+  button: HTMLButtonElement;
+  status: HTMLElement;
+  capturingMessage: string;
+  sharedMessage: string;
+  watermark: boolean;
+}
 
-  screenshotShareButton.addEventListener("click", async () => {
-    if (sharing) {
+function wireShareButton(
+  elements: AppElements,
+  config: ShareButtonConfig,
+  isSharing: () => boolean,
+  setSharing: (value: boolean) => void,
+): void {
+  const {
+    screenshotShareSection,
+    imageShareSection,
+    wishDisplay,
+    screenshotShareButton,
+    imageShareButton,
+  } = elements;
+  const sectionsToHide = [screenshotShareSection, imageShareSection];
+  const buttons = [screenshotShareButton, imageShareButton];
+
+  config.button.addEventListener("click", async () => {
+    if (isSharing()) {
       return;
     }
 
-    sharing = true;
-    screenshotShareButton.disabled = true;
-    hideStatus(screenshotShareStatus);
-    showStatus(screenshotShareStatus, STATUS_SCREENSHOT_CAPTURING);
+    setSharing(true);
+    for (const button of buttons) {
+      button.disabled = true;
+    }
+    hideStatus(config.status);
+    showStatus(config.status, config.capturingMessage);
 
     const wish = readVisibleWish(wishDisplay);
-    screenshotShareSection.hidden = true;
+    for (const section of sectionsToHide) {
+      section.hidden = true;
+    }
 
     try {
-      const imageDataUrl = await captureAppScreenshot();
+      const imageDataUrl = await captureAppScreenshot({ watermark: config.watermark });
       await shareScreenshot(imageDataUrl, wish);
       showStatus(
-        screenshotShareStatus,
-        isUrlFallbackActive() ? STATUS_URL_SHARED : STATUS_SCREENSHOT_SHARED,
+        config.status,
+        isUrlFallbackActive() ? STATUS_URL_SHARED : config.sharedMessage,
       );
     } catch (error) {
-      showStatus(screenshotShareStatus, formatShareErrorMessage(error), true);
+      showStatus(config.status, formatShareErrorMessage(error), true);
     } finally {
-      screenshotShareSection.hidden = false;
-      sharing = false;
-      screenshotShareButton.disabled = false;
+      for (const section of sectionsToHide) {
+        section.hidden = false;
+      }
+      setSharing(false);
+      for (const button of buttons) {
+        button.disabled = false;
+      }
     }
   });
+}
+
+export function wireScreenshotShare(elements: AppElements): void {
+  let sharing = false;
+
+  wireShareButton(
+    elements,
+    {
+      button: elements.screenshotShareButton,
+      status: elements.screenshotShareStatus,
+      capturingMessage: STATUS_SCREENSHOT_CAPTURING,
+      sharedMessage: STATUS_SCREENSHOT_SHARED,
+      watermark: false,
+    },
+    () => sharing,
+    (value) => {
+      sharing = value;
+    },
+  );
+
+  wireShareButton(
+    elements,
+    {
+      button: elements.imageShareButton,
+      status: elements.imageShareStatus,
+      capturingMessage: STATUS_IMAGE_SHARE_CAPTURING,
+      sharedMessage: STATUS_IMAGE_SHARED,
+      watermark: true,
+    },
+    () => sharing,
+    (value) => {
+      sharing = value;
+    },
+  );
 }

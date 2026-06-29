@@ -1,5 +1,5 @@
 import html2canvas from "html2canvas";
-import { CSS_VARS } from "./constants";
+import { CSS_VARS, SHARE_TITLE } from "./constants";
 
 /** FB Feed min width/height ratio (landscape). */
 const FB_MIN_ASPECT = 1.91;
@@ -74,7 +74,47 @@ function normalizeAspectRatio(source: HTMLCanvasElement): HTMLCanvasElement {
   return output;
 }
 
-export async function captureAppScreenshot(): Promise<string> {
+function drawWatermark(canvas: HTMLCanvasElement, label: string): void {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    return;
+  }
+
+  const padding = Math.round(canvas.width * 0.03);
+  const fontSize = Math.max(16, Math.round(canvas.width * 0.04));
+  ctx.font = `bold ${fontSize}px system-ui, sans-serif`;
+  ctx.textAlign = "right";
+  ctx.textBaseline = "bottom";
+
+  const textWidth = ctx.measureText(label).width;
+  const barWidth = textWidth + padding * 2;
+  const barHeight = fontSize + padding * 2;
+  const barX = canvas.width - barWidth - padding;
+  const barY = canvas.height - barHeight - padding;
+
+  ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
+  ctx.fillRect(barX, barY, barWidth, barHeight);
+
+  ctx.fillStyle = readCssVar(CSS_VARS.colorAccent);
+  ctx.fillText(label, canvas.width - padding * 2, canvas.height - padding * 2);
+}
+
+const SHARE_UI_IDS = new Set([
+  "screenshot-share-section",
+  "screenshot-share-button",
+  "screenshot-share-status",
+  "image-share-section",
+  "image-share-button",
+  "image-share-status",
+]);
+
+export interface CaptureAppScreenshotOptions {
+  watermark?: boolean;
+}
+
+export async function captureAppScreenshot(
+  options: CaptureAppScreenshotOptions = {},
+): Promise<string> {
   const app = document.querySelector("main.app");
   if (!app) {
     throw new Error("App element not found.");
@@ -84,11 +124,13 @@ export async function captureAppScreenshot(): Promise<string> {
     backgroundColor: null,
     useCORS: true,
     scale: window.devicePixelRatio || 1,
-    ignoreElements: (el) =>
-      el.id === "screenshot-share-button" || el.id === "screenshot-share-status",
+    ignoreElements: (el) => SHARE_UI_IDS.has(el.id),
   });
 
   const scaled = scaleCanvas(canvas, MAX_OUTPUT_WIDTH);
   const normalized = normalizeAspectRatio(scaled);
+  if (options.watermark) {
+    drawWatermark(normalized, SHARE_TITLE);
+  }
   return normalized.toDataURL("image/png");
 }

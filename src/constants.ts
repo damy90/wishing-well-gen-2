@@ -11,7 +11,9 @@ export const STATUS_SHARE_FAILED =
   "Share cancelled or failed. Try again.";
 
 export const STATUS_SCREENSHOT_CAPTURING = "Capturing screenshot…";
+export const STATUS_IMAGE_SHARE_CAPTURING = "Preparing share image…";
 export const STATUS_SCREENSHOT_SHARED = "Screenshot shared!";
+export const STATUS_IMAGE_SHARED = "Image shared!";
 export const SCREENSHOT_SHARE_GENERIC_TEXT = "Check out Wishing Well!";
 
 export const STARTUP_FB_UNAVAILABLE =
