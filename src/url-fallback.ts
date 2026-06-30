@@ -1,4 +1,9 @@
-import { SCREENSHOT_SHARE_GENERIC_TEXT, SHARE_TITLE, shareText } from "./constants";
+import {
+  getAppShareUrl,
+  SCREENSHOT_SHARE_GENERIC_TEXT,
+  SHARE_TITLE,
+  shareText,
+} from "./constants";
 
 function dataUrlToBlob(dataUrl: string): Blob {
   const [header, base64] = dataUrl.split(",");
@@ -28,6 +33,21 @@ export function buildWishUrl(wish: string): string {
   url.search = "";
   url.searchParams.set("wish", wish);
   return url.toString();
+}
+
+export async function shareAppUrl(): Promise<void> {
+  const url = getAppShareUrl();
+
+  if (navigator.share) {
+    await navigator.share({ title: SHARE_TITLE, text: url, url });
+    return;
+  }
+
+  if (!navigator.clipboard?.writeText) {
+    throw new Error("Sharing is not supported in this browser.");
+  }
+
+  await navigator.clipboard.writeText(url);
 }
 
 export async function shareWishUrl(wish: string): Promise<void> {

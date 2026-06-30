@@ -1,6 +1,7 @@
 import {
   DEFAULT_PLAYER_NAME,
   FB_SDK_WAIT_MS,
+  getAppShareUrl,
   SCREENSHOT_SHARE_GENERIC_TEXT,
   SHARE_INTENT,
   shareText,
@@ -94,6 +95,18 @@ export async function mountPlayerNameOverlay(container: HTMLElement): Promise<bo
     console.warn("[FBInstant] profile name overlay failed:", error);
     return false;
   }
+}
+
+export async function shareAppLink(): Promise<void> {
+  const sdk = getSDK();
+  const payload = {
+    intent: SHARE_INTENT,
+    text: getAppShareUrl(),
+    data: {},
+    image: createShareImage(),
+  };
+
+  await sdk.shareAsync(payload);
 }
 
 export async function shareWish(wish: string): Promise<void> {

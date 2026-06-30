@@ -14,6 +14,7 @@ export const STATUS_SCREENSHOT_CAPTURING = "Capturing screenshot…";
 export const STATUS_IMAGE_SHARE_CAPTURING = "Preparing share image…";
 export const STATUS_SCREENSHOT_SHARED = "Screenshot shared!";
 export const STATUS_IMAGE_SHARED = "Image shared!";
+export const STATUS_APP_LINK_SHARED = "App link shared!";
 export const SCREENSHOT_SHARE_GENERIC_TEXT = "Check out Wishing Well!";
 
 export const DATA_IMAGE_WAITING = "Waiting…";
@@ -59,6 +60,10 @@ export const CSS_VARS = {
 
 export function shareText(wish: string): string {
   return `I whish you: ${wish}`;
+}
+
+export function getAppShareUrl(): string {
+  return `${getServerBaseUrl()}/`;
 }
 
 /** GitHub Pages origin for server assets. */

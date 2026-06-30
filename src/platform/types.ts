@@ -9,9 +9,11 @@ export interface Platform {
   getLocale(): string | null;
   shareWish(wish: string): Promise<void>;
   shareScreenshot(imageDataUrl: string, wish?: string): Promise<void>;
+  shareAppLink(): Promise<void>;
   formatShareError(error: unknown): string;
   shareWishSuccessMessage(): string;
   shareScreenshotSuccessMessage(): string;
+  shareAppLinkSuccessMessage(): string;
   mountPlayerNameOverlay?(container: HTMLElement): Promise<boolean>;
 }
 

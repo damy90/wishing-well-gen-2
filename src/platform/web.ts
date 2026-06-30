@@ -6,6 +6,7 @@ import {
 import {
   getUserFromUrl,
   getWishFromUrl,
+  shareAppUrl,
   shareScreenshotUrl,
   shareWishUrl,
 } from "../url-fallback";
@@ -36,6 +37,10 @@ export const webPlatform: Platform = {
     return shareScreenshotUrl(imageDataUrl, wish);
   },
 
+  shareAppLink(): Promise<void> {
+    return shareAppUrl();
+  },
+
   formatShareError(): string {
     return STATUS_SHARE_FAILED;
   },
@@ -45,6 +50,10 @@ export const webPlatform: Platform = {
   },
 
   shareScreenshotSuccessMessage(): string {
+    return STATUS_URL_SHARED;
+  },
+
+  shareAppLinkSuccessMessage(): string {
     return STATUS_URL_SHARED;
   },
 };

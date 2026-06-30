@@ -1,5 +1,6 @@
 import {
   DEFAULT_PLAYER_NAME,
+  STATUS_APP_LINK_SHARED,
   STATUS_SCREENSHOT_SHARED,
   STATUS_SENT,
 } from "../constants";
@@ -9,6 +10,7 @@ import {
   getPlayerName as getFbPlayerName,
   initFacebook,
   mountPlayerNameOverlay as fbMountPlayerNameOverlay,
+  shareAppLink as fbShareAppLink,
   shareScreenshot as fbShareScreenshot,
   shareWish as fbShareWish,
 } from "../facebook";
@@ -38,6 +40,10 @@ export const facebookPlatform: Platform = {
     return fbShareScreenshot(imageDataUrl, wish);
   },
 
+  shareAppLink(): Promise<void> {
+    return fbShareAppLink();
+  },
+
   formatShareError(error: unknown): string {
     return formatShareErrorMessage(error);
   },
@@ -48,6 +54,10 @@ export const facebookPlatform: Platform = {
 
   shareScreenshotSuccessMessage(): string {
     return STATUS_SCREENSHOT_SHARED;
+  },
+
+  shareAppLinkSuccessMessage(): string {
+    return STATUS_APP_LINK_SHARED;
   },
 
   mountPlayerNameOverlay(container: HTMLElement): Promise<boolean> {

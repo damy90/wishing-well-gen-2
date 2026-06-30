@@ -10,6 +10,7 @@ import {
   formatGeoLocation,
   getLogoUrl,
 } from "./server-data";
+import { wireAppShareLink } from "./app-share-link";
 import { wireScreenshotShare } from "./screenshot-share";
 import { wireSendForm } from "./send-form";
 import {
@@ -49,6 +50,7 @@ function revealWithUi(incomingWish?: string): void {
   displayWish(elements.wishDisplay, incomingWish);
   wireSendForm(elements);
   wireScreenshotShare(elements);
+  wireAppShareLink(elements);
 }
 
 async function main(): Promise<void> {

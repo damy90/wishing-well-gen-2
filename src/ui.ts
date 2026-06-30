@@ -56,6 +56,8 @@ export interface AppElements {
   imageShareSection: HTMLElement;
   imageShareButton: HTMLButtonElement;
   imageShareStatus: HTMLElement;
+  appShareLinkButton: HTMLButtonElement;
+  appShareLinkStatus: HTMLElement;
 }
 
 export function getElements(): AppElements {
@@ -80,6 +82,10 @@ export function getElements(): AppElements {
     imageShareSection: document.getElementById("image-share-section")!,
     imageShareButton: document.getElementById("image-share-button") as HTMLButtonElement,
     imageShareStatus: document.getElementById("image-share-status")!,
+    appShareLinkButton: document.getElementById(
+      "app-share-link-button",
+    ) as HTMLButtonElement,
+    appShareLinkStatus: document.getElementById("app-share-link-status")!,
   };
 }
 

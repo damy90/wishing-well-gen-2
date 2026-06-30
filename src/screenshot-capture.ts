@@ -106,6 +106,8 @@ const SHARE_UI_IDS = new Set([
   "image-share-section",
   "image-share-button",
   "image-share-status",
+  "app-share-link-button",
+  "app-share-link-status",
 ]);
 
 export interface CaptureAppScreenshotOptions {
