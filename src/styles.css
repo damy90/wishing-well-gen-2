@@ -289,3 +289,19 @@ body {
 .data-send-back-button {
   margin-top: 0.75rem;
 }
+
+.app-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.app-footer__link {
+  font-size: 0.9rem;
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.app-footer__link:hover {
+  color: #c4e8ea;
+}

@@ -1,13 +1,11 @@
 import {
   DEFAULT_PLAYER_NAME,
-  FB_INIT_TIMEOUT_MS,
   FB_SDK_WAIT_MS,
-  FONTS_READY_TIMEOUT_MS,
   SCREENSHOT_SHARE_GENERIC_TEXT,
   SHARE_INTENT,
   shareText,
 } from "../constants";
-import { shareScreenshotUrl, shareWishUrl } from "../url-fallback";
+import { runInitialLoad } from "../platform/initial-load";
 import { installDevMock } from "./dev-mock";
 import { formatShareErrorMessage } from "./sdk-error";
 import { createShareImage } from "./share-image";
@@ -17,21 +15,6 @@ export type { SharePayload, WishEntryData } from "./types";
 export { formatShareErrorMessage };
 
 const FB_SDK_POLL_MS = 50;
-
-let urlFallbackActive = false;
-
-export function useUrlFallback(): void {
-  urlFallbackActive = true;
-}
-
-export function isUrlFallbackActive(): boolean {
-  return urlFallbackActive;
-}
-
-export function logStartupFailure(error: unknown): void {
-  const detail = error instanceof Error ? error.message : String(error);
-  console.warn("[FBInstant] init failed:", detail, error);
-}
 
 function getSDK(): FBInstantSDK {
   if (import.meta.env.DEV) {
@@ -52,21 +35,6 @@ async function waitForFBInstant(deadlineMs: number): Promise<void> {
     }
     await new Promise((resolve) => setTimeout(resolve, FB_SDK_POLL_MS));
   }
-}
-
-async function runInitialLoad(
-  onProgress: (progress: number) => void,
-): Promise<void> {
-  onProgress(10);
-
-  if (document.fonts?.ready) {
-    await Promise.race([
-      document.fonts.ready,
-      new Promise<void>((resolve) => setTimeout(resolve, FONTS_READY_TIMEOUT_MS)),
-    ]);
-  }
-
-  onProgress(90);
 }
 
 export async function initFacebook(): Promise<WishEntryData | null> {
@@ -109,7 +77,7 @@ export function getLocale(): string | null {
 
 /** Mount Meta-hosted player name (Zero Permissions SDK). Returns true if shown. */
 export async function mountPlayerNameOverlay(container: HTMLElement): Promise<boolean> {
-  if (import.meta.env.DEV || urlFallbackActive) {
+  if (import.meta.env.DEV) {
     return false;
   }
 
@@ -129,11 +97,6 @@ export async function mountPlayerNameOverlay(container: HTMLElement): Promise<bo
 }
 
 export async function shareWish(wish: string): Promise<void> {
-  if (urlFallbackActive) {
-    await shareWishUrl(wish);
-    return;
-  }
-
   const sdk = getSDK();
   const payload = {
     intent: SHARE_INTENT,
@@ -149,11 +112,6 @@ export async function shareScreenshot(
   imageDataUrl: string,
   wish?: string,
 ): Promise<void> {
-  if (urlFallbackActive) {
-    await shareScreenshotUrl(imageDataUrl, wish);
-    return;
-  }
-
   const sdk = getSDK();
   const payload = {
     intent: SHARE_INTENT,

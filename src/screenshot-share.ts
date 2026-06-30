@@ -4,13 +4,8 @@ import {
   STATUS_IMAGE_SHARED,
   STATUS_SCREENSHOT_CAPTURING,
   STATUS_SCREENSHOT_SHARED,
-  STATUS_URL_SHARED,
 } from "./constants";
-import {
-  formatShareErrorMessage,
-  isUrlFallbackActive,
-  shareScreenshot,
-} from "./facebook";
+import { getPlatform } from "./platform";
 import { captureAppScreenshot } from "./screenshot-capture";
 import { hideStatus, showStatus, type AppElements } from "./ui";
 
@@ -41,6 +36,7 @@ function wireShareButton(
   isSharing: () => boolean,
   setSharing: (value: boolean) => void,
 ): void {
+  const platform = getPlatform();
   const {
     screenshotShareSection,
     imageShareSection,
@@ -70,13 +66,14 @@ function wireShareButton(
 
     try {
       const imageDataUrl = await captureAppScreenshot({ watermark: config.watermark });
-      await shareScreenshot(imageDataUrl, wish);
-      showStatus(
-        config.status,
-        isUrlFallbackActive() ? STATUS_URL_SHARED : config.sharedMessage,
-      );
+      await platform.shareScreenshot(imageDataUrl, wish);
+      const sharedMessage =
+        platform.id === "web"
+          ? platform.shareScreenshotSuccessMessage()
+          : config.sharedMessage;
+      showStatus(config.status, sharedMessage);
     } catch (error) {
-      showStatus(config.status, formatShareErrorMessage(error), true);
+      showStatus(config.status, platform.formatShareError(error), true);
     } finally {
       for (const section of sectionsToHide) {
         section.hidden = false;

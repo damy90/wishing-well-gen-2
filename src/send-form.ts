@@ -1,5 +1,4 @@
-import { STATUS_SENT, STATUS_URL_SHARED } from "./constants";
-import { formatShareErrorMessage, isUrlFallbackActive, shareWish } from "./facebook";
+import { getPlatform } from "./platform";
 import {
   clearInput,
   hideStatus,
@@ -9,6 +8,7 @@ import {
 } from "./ui";
 
 export function wireSendForm(elements: AppElements): void {
+  const platform = getPlatform();
   const { wishInput, sendButton, sendForm, statusMessage } = elements;
   let sending = false;
 
@@ -29,14 +29,11 @@ export function wireSendForm(elements: AppElements): void {
     hideStatus(statusMessage);
 
     try {
-      await shareWish(wish);
+      await platform.shareWish(wish);
       clearInput(wishInput);
-      showStatus(
-        statusMessage,
-        isUrlFallbackActive() ? STATUS_URL_SHARED : STATUS_SENT,
-      );
+      showStatus(statusMessage, platform.shareWishSuccessMessage());
     } catch (error) {
-      showStatus(statusMessage, formatShareErrorMessage(error), true);
+      showStatus(statusMessage, platform.formatShareError(error), true);
     } finally {
       sending = false;
       updateSendButton(sendButton, wishInput, sending);

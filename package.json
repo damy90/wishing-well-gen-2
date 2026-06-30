@@ -4,10 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --config vite.web.config.ts",
+    "dev:facebook": "vite --config vite.config.ts",
     "start": "node server/index.mjs",
     "server": "node server/index.mjs",
-    "dev:full": "node server/index.mjs & vite",
+    "dev:full": "node server/index.mjs & vite --config vite.web.config.ts",
     "build": "vite build",
     "build:facebook": "node scripts/sync-server-assets.mjs && vite build && node scripts/build-facebook.mjs",
     "build:github-pages": "node scripts/sync-server-assets.mjs && vite build --config vite.github-pages.config.ts && node scripts/build-github-pages.mjs"

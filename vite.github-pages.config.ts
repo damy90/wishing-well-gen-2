@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import { omitFbInstantInDevPlugin, sharedBuildOptions } from "./vite.shared";
+import { platformHtmlPlugin, sharedBuildOptions } from "./vite.shared";
 
 const githubPagesBase =
   process.env.GITHUB_PAGES_BASE?.trim() || "/wishing-well-gen-2/";
@@ -15,5 +15,8 @@ export default defineConfig({
       },
     },
   },
-  plugins: [omitFbInstantInDevPlugin],
+  plugins: [platformHtmlPlugin("web")],
+  define: {
+    "import.meta.env.VITE_PLATFORM": JSON.stringify("web"),
+  },
 });

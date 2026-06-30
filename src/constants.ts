@@ -16,9 +16,6 @@ export const STATUS_SCREENSHOT_SHARED = "Screenshot shared!";
 export const STATUS_IMAGE_SHARED = "Image shared!";
 export const SCREENSHOT_SHARE_GENERIC_TEXT = "Check out Wishing Well!";
 
-export const STARTUP_FB_UNAVAILABLE =
-  "Facebook SDK not connected — receive via ?wish= in the URL; Send shares a link.";
-
 export const DATA_IMAGE_WAITING = "Waiting…";
 export const DATA_IMAGE_FAILED = "Failed to load data.";
 
@@ -29,9 +26,6 @@ export const DATA_SEND_BACK_FAILED = "Failed to send data.";
 export const DEFAULT_PLAYER_NAME = "anonymous";
 
 export const LOCATION_UNKNOWN = "Location: unknown";
-
-/** Milliseconds before showing the UI when FBInstant init hangs outside Facebook. */
-export const FB_INIT_TIMEOUT_MS = import.meta.env.DEV ? 10_000 : 30_000;
 
 /** Max wait for FBInstant to appear on window before init (production only). */
 export const FB_SDK_WAIT_MS = 5_000;
